@@ -51,6 +51,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-index-
 
+      # Install OpenSSL for Linux
+      - name: Install OpenSSL
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev
+        if: runner.os == 'Linux'
+
+      # Install OpenSSL for macOS
+      - name: Install OpenSSL
+        run: brew install openssl
+        if: runner.os == 'macOS'
+
+      # Set OpenSSL environment variable
+      - name: Set OpenSSL environment variable
+        run: echo "OPENSSL_DIR=/usr" >> $GITHUB_ENV
+        if: runner.os == 'Linux'
+
+      - name: Set OpenSSL environment variable (macOS)
+        run: echo "OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
+        if: runner.os == 'macOS'
+
       # Build the application
       - name: Build the application
         run: cargo build --release --target ${{ matrix.target }}
