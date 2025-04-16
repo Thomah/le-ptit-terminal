@@ -57,7 +57,7 @@ jobs:
 
       # Upload the binary as an artifact
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}-binary
           path: target/${{ matrix.target }}/release/lpg-app
