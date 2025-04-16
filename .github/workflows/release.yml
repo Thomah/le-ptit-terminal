@@ -1,0 +1,85 @@
+name: Release Workflow
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-release:
+    name: Build and Release Binaries
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        target: [x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc, x86_64-apple-darwin]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Rust
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          target: ${{ matrix.target }}
+
+      # Cache Cargo dependencies
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache Cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/index
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
+
+      # Build the application
+      - name: Build the application
+        run: cargo build --release --target ${{ matrix.target }}
+
+      # Upload the binary as an artifact
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.target }}-binary
+          path: target/${{ matrix.target }}/release/lpg-app
+
+  upload-release-assets:
+    name: Upload Release Assets
+    needs: build-and-release
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download all artifacts from the build jobs
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: binaries
+
+      # Upload binaries as release assets
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_id: ${{ github.event.release.id }}
+          asset_path: binaries
+          asset_name: ${{ matrix.target }}-lpg-app
+          asset_content_type: application/octet-stream

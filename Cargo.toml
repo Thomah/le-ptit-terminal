@@ -1,0 +1,25 @@
+[package]
+name = "lpg-app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Terminal UI and Input
+ratatui = "0.25" # For rendering terminal-based UI components
+crossterm = "0.27" # For handling terminal input and output
+
+# HTTP Requests and JSON Handling
+reqwest = { version = "0.12", features = ["json", "blocking"] } # For making HTTP requests (blocking mode)
+serde = { version = "1", features = ["derive"] } # For serializing and deserializing JSON
+serde_json = "1.0" # For working with JSON data
+
+# Utilities
+webbrowser = "1.0" # For opening URLs in the default web browser
+anyhow = "1.0" # For error handling
+chrono = { version = "0.4", features = ["serde"] } # For date and time manipulation
+dirs = "6.0" # For locating user directories
+arboard = "3.5" # For clipboard functionality
+
+# Logging
+log = "0.4" # For logging
+simplelog = "0.12" # For simple logging to files or the console
