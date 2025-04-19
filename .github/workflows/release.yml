@@ -5,6 +5,9 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     name: Build and Release Binaries
@@ -59,7 +62,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}-binary
-          path: target/${{ matrix.target }}/release/le-ptit-terminal*
+          if-no-files-found: ignore
+          path: |
+            target/${{ matrix.target }}/release/le-ptit-terminal
+            target/${{ matrix.target }}/release/le-ptit-terminal.exe
 
   upload-release-assets:
     name: Upload Release Assets
@@ -83,6 +89,6 @@ jobs:
         if: github.ref_type == 'tag'
         with:
           files: |
-            binaries/x86_64-unknown-linux-gnu-binary
-            binaries/x86_64-apple-darwin-binary
-            binaries/x86_64-pc-windows-msvc
+            binaries/x86_64-unknown-linux-gnu-binary/le-ptit-terminal
+            binaries/x86_64-apple-darwin-binary/le-ptit-terminal
+            binaries/x86_64-pc-windows-msvc/le-ptit-terminal.exe
