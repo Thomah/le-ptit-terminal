@@ -60,8 +60,13 @@ jobs:
       # Rename the binary to include the OS in the filename
       - name: Rename binary
         run: |
-          mv target/${{ matrix.target }}/release/le-ptit-terminal target/${{ matrix.target }}/release/le-ptit-terminal-${{ matrix.os }}
-          mv target/${{ matrix.target }}/release/le-ptit-terminal.exe target/${{ matrix.target }}/release/le-ptit-terminal-${{ matrix.os }}.exe
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            mv target/${{ matrix.target }}/release/le-ptit-terminal.exe target/${{ matrix.target }}/release/le-ptit-terminal-windows.exe;
+          elif [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            mv target/${{ matrix.target }}/release/le-ptit-terminal target/${{ matrix.target }}/release/le-ptit-terminal-ubuntu;
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            mv target/${{ matrix.target }}/release/le-ptit-terminal target/${{ matrix.target }}/release/le-ptit-terminal-macos;
+          fi
 
       # Upload the binary as an artifact
       - name: Upload binary
@@ -89,6 +94,6 @@ jobs:
         if: github.ref_type == 'tag'
         with:
           files: |
-            binaries/x86_64-unknown-linux-gnu-binary/le-ptit-terminal-ubuntu-latest
-            binaries/x86_64-apple-darwin-binary/le-ptit-terminal-macos-latest
-            binaries/x86_64-pc-windows-msvc-binary/le-ptit-terminal-windows-latest.exe
+            binaries/x86_64-unknown-linux-gnu-binary/le-ptit-terminal-ubuntu
+            binaries/x86_64-apple-darwin-binary/le-ptit-terminal-macos
+            binaries/x86_64-pc-windows-msvc-binary/le-ptit-terminal-windows.exe
