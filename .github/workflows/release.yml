@@ -57,15 +57,19 @@ jobs:
       - name: Build the application
         run: cargo build --release --target ${{ matrix.target }}
 
+      # Rename the binary to include the OS in the filename
+      - name: Rename binary
+        run: |
+          mv target/${{ matrix.target }}/release/le-ptit-terminal target/${{ matrix.target }}/release/le-ptit-terminal-${{ matrix.os }}
+          mv target/${{ matrix.target }}/release/le-ptit-terminal.exe target/${{ matrix.target }}/release/le-ptit-terminal-${{ matrix.os }}.exe
+
       # Upload the binary as an artifact
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}-binary
           if-no-files-found: ignore
-          path: |
-            target/${{ matrix.target }}/release/le-ptit-terminal
-            target/${{ matrix.target }}/release/le-ptit-terminal.exe
+          path: target/${{ matrix.target }}/release/le-ptit-terminal-*
 
   upload-release-assets:
     name: Upload Release Assets
@@ -79,16 +83,12 @@ jobs:
         with:
           path: binaries
 
-      # Debug: List target directory
-      - name: List target directory
-        run: ls -R binaries
-
       # Upload binaries as release assets
       - name: Release
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
           files: |
-            binaries/x86_64-unknown-linux-gnu-binary/le-ptit-terminal
-            binaries/x86_64-apple-darwin-binary/le-ptit-terminal
-            binaries/x86_64-pc-windows-msvc-binary/le-ptit-terminal.exe
+            binaries/x86_64-unknown-linux-gnu-binary/le-ptit-terminal-ubuntu-latest
+            binaries/x86_64-apple-darwin-binary/le-ptit-terminal-macos-latest
+            binaries/x86_64-pc-windows-msvc-binary/le-ptit-terminal-windows-latest.exe
