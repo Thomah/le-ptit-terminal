@@ -1,8 +1,9 @@
 name: Release Workflow
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build-and-release:
@@ -53,12 +54,16 @@ jobs:
       - name: Build the application
         run: cargo build --release --target ${{ matrix.target }}
 
+      # Debug: List target directory
+      - name: List target directory
+        run: ls -R target/${{ matrix.target }}/release
+
       # Upload the binary as an artifact
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}-binary
-          path: target/${{ matrix.target }}/release/lpg-app
+          path: target/${{ matrix.target }}/release/le-ptit-terminal
 
   upload-release-assets:
     name: Upload Release Assets
@@ -73,11 +78,11 @@ jobs:
           path: binaries
 
       # Upload binaries as release assets
-      - name: Upload release assets
-        uses: actions/upload-release-asset@v1
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          release_id: ${{ github.event.release.id }}
-          asset_path: binaries
-          asset_name: ${{ matrix.target }}-lpg-app
-          asset_content_type: application/octet-stream
+          files: |
+            binaries/x86_64-unknown-linux-gnu-binary
+            binaries/x86_64-apple-darwin-binary
+            binaries/x86_64-pc-windows-msvc

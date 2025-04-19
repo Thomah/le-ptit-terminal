@@ -892,6 +892,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "le-ptit-terminal"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arboard",
+ "chrono",
+ "crossterm",
+ "dirs",
+ "log",
+ "ratatui",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "simplelog",
+ "webbrowser",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.171"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -940,24 +958,6 @@ name = "log"
 version = "0.4.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94"
-
-[[package]]
-name = "lpg-app"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arboard",
- "chrono",
- "crossterm",
- "dirs",
- "log",
- "ratatui",
- "reqwest",
- "serde",
- "serde_json",
- "simplelog",
- "webbrowser",
-]
 
 [[package]]
 name = "lru"
