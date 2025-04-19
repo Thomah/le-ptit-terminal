@@ -54,16 +54,12 @@ jobs:
       - name: Build the application
         run: cargo build --release --target ${{ matrix.target }}
 
-      # Debug: List target directory
-      - name: List target directory
-        run: ls -R target/${{ matrix.target }}/release
-
       # Upload the binary as an artifact
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}-binary
-          path: target/${{ matrix.target }}/release/le-ptit-terminal
+          path: target/${{ matrix.target }}/release/le-ptit-terminal*
 
   upload-release-assets:
     name: Upload Release Assets
@@ -76,6 +72,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: binaries
+
+      # Debug: List target directory
+      - name: List target directory
+        run: ls -R binaries
 
       # Upload binaries as release assets
       - name: Release
