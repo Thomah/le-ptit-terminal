@@ -59,17 +59,17 @@ jobs:
 
       # Rename the binary to include the OS in the filename
       - name: Rename binary (Windows)
-        if: runner.os == 'windows-latest'
+        if: runner.os == 'Windows'
         run: |
           ren target\${{ matrix.target }}\release\le-ptit-terminal.exe le-ptit-terminal-windows.exe
 
-      - name: Rename binary (Ubuntu)
-        if: runner.os == 'ubuntu-latest'
+      - name: Rename binary (Linux)
+        if: runner.os == 'Linux'
         run: |
           mv target/${{ matrix.target }}/release/le-ptit-terminal target/${{ matrix.target }}/release/le-ptit-terminal-ubuntu
 
       - name: Rename binary (macOS)
-        if: runner.os == 'macos-latest'
+        if: runner.os == 'macOS'
         run: |
           mv target/${{ matrix.target }}/release/le-ptit-terminal target/${{ matrix.target }}/release/le-ptit-terminal-macos
 
