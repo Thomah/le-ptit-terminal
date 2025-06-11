@@ -13,25 +13,25 @@ struct OrganizationsResponse {
 }
 
 #[derive(Debug, Deserialize)]
-struct Event {
-    id: String,
-    name: EventName,
-    start: EventStart,
+pub(crate) struct Event {
+    pub id: String,
+    pub name: EventName,
+    pub start: EventStart,
 }
 
 #[derive(Debug, Deserialize)]
-struct EventStart {
-    local: String
+pub struct EventStart {
+    pub local: String
 }
 
 #[derive(Debug, Deserialize)]
-struct EventName {
-    text: String,
+pub struct EventName {
+    pub text: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct EventsResponse {
-    events: Vec<Event>,
+pub struct EventsResponse {
+    pub events: Vec<Event>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -111,7 +111,7 @@ pub fn get_attendees_from_api(token: &str) -> Result<(Vec<Attendee>, String), an
     Ok((attendees, event_date))
 }
 
-fn get_organization_id(client: &Client, token: &str) -> Option<String> {
+pub fn get_organization_id(client: &Client, token: &str) -> Option<String> {
     debug!("Fetching organization ID...");
     let res = client
         .get("https://www.eventbriteapi.com/v3/users/me/organizations/")
@@ -130,7 +130,7 @@ fn get_organization_id(client: &Client, token: &str) -> Option<String> {
     org_id
 }
 
-fn get_next_event(client: &Client, token: &str, org_id: &str) -> Option<Event> {
+pub fn get_next_event(client: &Client, token: &str, org_id: &str) -> Option<Event> {
     debug!("Fetching next event for organization ID: {}", org_id);
     let res = client
         .get(&format!(
@@ -153,7 +153,7 @@ fn get_next_event(client: &Client, token: &str, org_id: &str) -> Option<Event> {
     next_event
 }
 
-fn get_attendees(client: &Client, token: &str, event_id: &str) -> Vec<Attendee> {
+pub fn get_attendees(client: &Client, token: &str, event_id: &str) -> Vec<Attendee> {
     debug!("Fetching attendees for event ID: {}", event_id);
     let mut attendees = vec![];
     let mut page = 1;

@@ -14,6 +14,7 @@ pub fn draw_ui(f: &mut Frame, app: &App) {
         AppView::SettingsMenu => draw_settings_menu(f, app),
         AppView::SetClientIdPopup => draw_popup(f, "Enter CLIENT_ID", &app.input_buffer),
         AppView::SetClientSecretPopup => draw_popup(f, "Enter CLIENT_SECRET", &app.input_buffer),
+        AppView::FindByNameMenu => draw_find_by_name_menu(f, app),
     }
 }
 
@@ -21,6 +22,7 @@ fn draw_main_menu(f: &mut Frame, app: &App) {
     let items = vec![
         ListItem::new("Liste des participants à la prochaine maraude"),
         ListItem::new("Paramétrage"),
+        ListItem::new("Rechercher un participant par nom"),
     ];
 
     let mut state = ListState::default();
@@ -300,4 +302,66 @@ fn centered_rect(percent_x: u16, percent_y: u16, rect: Rect) -> Rect {
             .as_ref(),
         )
         .split(popup_layout[1])[1]
+}
+
+fn draw_find_by_name_menu(f: &mut Frame, app: &App) {
+    let state = &app.name_search_state;
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(3),
+            Constraint::Length(3),
+            Constraint::Min(5),
+            Constraint::Length(1),
+        ])
+        .split(f.size());
+
+    // Input fields
+    let first_name = format!("Prénom: {}", state.input_first_name);
+    let last_name = format!("Nom: {}", state.input_last_name);
+
+    let first_name_paragraph = Paragraph::new(first_name)
+        .block(Block::default().borders(Borders::ALL).title("Prénom"))
+        .style(if state.focus == 0 { Style::default().fg(Color::Magenta) } else { Style::default() });
+    let last_name_paragraph = Paragraph::new(last_name)
+        .block(Block::default().borders(Borders::ALL).title("Nom"))
+        .style(if state.focus == 1 { Style::default().fg(Color::Magenta) } else { Style::default() });
+
+    f.render_widget(first_name_paragraph, chunks[0]);
+    f.render_widget(last_name_paragraph, chunks[1]);
+
+    // Results
+    let results = if let Some(ref events) = state.results {
+        if events.is_empty() {
+            vec![ListItem::new("Aucun événement trouvé.")]
+        } else {
+            events.iter().map(|(event_name, event_date)| {
+                ListItem::new(format!("{} ({})", event_name, event_date))
+            }).collect()
+        }
+    } else {
+        vec![ListItem::new("Entrer prénom et nom, puis valider.")]
+    };
+
+    let mut list_state = ListState::default();
+    if state.focus == 2 && results.len() > 1 {
+        list_state.select(Some(state.results_scroll));
+    }
+
+    let results_list = List::new(results)
+        .block(Block::default().borders(Borders::ALL).title("Événements trouvés"))
+        .highlight_style(Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD));
+
+    f.render_stateful_widget(results_list, chunks[2], &mut list_state);
+
+    // Status bar
+    let status = if state.focus < 2 {
+        "Entrer prénom/nom, Tab pour changer de champ, Entrée pour valider, Échap pour quitter"
+    } else {
+        "↑/↓ pour défiler, Échap pour revenir"
+    };
+    let status_bar = Paragraph::new(status)
+        .style(Style::default().fg(Color::Magenta))
+        .alignment(Alignment::Center);
+    f.render_widget(status_bar, chunks[3]);
 }
